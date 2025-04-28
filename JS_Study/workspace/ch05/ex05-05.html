@@ -1,0 +1,142 @@
+ㅓ
+<body>
+  <div id="todo">
+    <header>
+      <h1>Todo List - 목록 조회 🦁</h1>
+      <!-- 페이지 제목 -->
+    </header>
+    <div id="main">
+      <div id="container">
+        <ul>
+          <li>
+            <h2>쇼핑 목록</h2>
+            <!-- 섹션 제목 -->
+            <div class="todoinput">
+              <!-- 사용자가 할 일 입력 -->
+              <input type="text" autofocus onkeyup="handleKeyup(event)" />
+              <!-- 버튼 클릭으로 할 일 추가 -->
+              <button type="button" onclick="handleAdd()">추가</button>
+            </div>
+
+            <!-- 할 일 리스트가 표시될 공간 -->
+            <ul class="todoList"></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <footer>
+      <p>멋쟁이 사자처럼 FrontEnd BootCamp</p>
+      <!-- 하단 문구 -->
+    </footer>
+  </div>
+
+  <script>
+    // 🚀 한건의 todo 객체를 받아서 DOM 객체로 만들어 반환하는 기능
+    function getTodoItemElem(item) {
+      const liElem = document.createElement("li"); // <li> 생성
+      liElem.dataset.no = item.no;
+      liElem.dataset.done = item.done;
+
+      const noElem = document.createElement("span"); // 번호 출력용 <span>
+      const titleElem = document.createElement("span"); // 제목 출력용 <span>
+      const deleteElem = document.createElement("button"); // 삭제 버튼
+
+      const noTxt = document.createTextNode(item.no); // 번호 텍스트
+      const titleTxt = document.createTextNode(item.title); // 제목 텍스트
+      const deleteTxt = document.createTextNode("삭제"); // 버튼 텍스트
+
+      // 요소 조립
+      noElem.appendChild(noTxt);
+      titleElem.appendChild(titleTxt);
+      deleteElem.setAttribute("type", "button");
+      deleteElem.appendChild(deleteTxt);
+
+      liElem.appendChild(noElem);
+      liElem.appendChild(titleElem);
+      liElem.appendChild(deleteElem);
+      liElem.setAttribute("tabindex", 0); // 키보드 접근성 위한 포커스
+
+      // 💬 방법 1
+      // liElem.dataset.no = item.no; // 고유 번호를 data-no 속성으로 저장
+
+      // 💬 방법 2
+      // liElem.setAttribute("data-no", item.no);
+
+      // 🚀 삭제 버튼 클릭 시 deleteItem 함수 호출 (방법 1, 미사용)
+
+      deleteElem.addEventListener("click", function (event) {
+        const btn = event.target;
+        const liNode = btn.closest("li");
+        deleteItem(liNode.dataset.no);
+      });
+
+      titleElem.addEventListener("click", function (event) {
+        const btn = event.target;
+        const liNode = btn.closest("li");
+        toggleDone(liNode.dataset.no);
+      });
+
+      // 🚀 삭제 버튼 클릭 시 deleteItem 호출 (방법 2, 인라인 방식)
+      deleteElem.setAttribute("onclick", `deleteItem(${item.no})`);
+
+      return liElem; // 완성된 li 반환
+    }
+
+    // 🚀 추가 버튼 클릭 이벤트 핸들러
+    function handleAdd() {
+      const inputElem = document.querySelector(".todoinput > input");
+      if (inputElem.value !== "") {
+        addItem(inputElem.value); // 입력값으로 항목 추가
+        inputElem.value = ""; // 입력창 초기화
+        inputElem.focus(); // 포커스 복원
+      }
+    }
+
+    // 🚀 엔터 키 입력 시 항목 추가
+    function handleKeyup(event) {
+      if (event.key === "Enter") {
+        handleAdd();
+      }
+    }
+
+    // 🚀 새로운 할 일 항목 추가
+    function addItem(title) {
+      const todoList = document.querySelector(".todoList"); // 리스트 컨테이너
+
+      const item = {
+        no: todoList.children.length + 1, // 항목 번호 (리스트 길이 기준)
+        title, // 사용자가 입력한 제목
+        done: false, // 초기 상태는 미완료
+      };
+
+      const todoLi = getTodoItemElem(item); // li 생성
+      console.log(todoLi);
+      todoList.appendChild(todoLi); // 리스트에 추가
+    }
+
+    // 🚀 (미사용) 완료 / 미완료 상태 토글용 함수
+    function toggleDone(no) {
+      const targetLi = document.querySelector(`.todoList >li[data-no="${no}"]`);
+      const done = targetLi.dataset.done === "true";
+      console.log(typeof done, done);
+      const titleEl = targetLi.querySelector("span:last-of-type"); // 마지막 span 찾아오기
+      if (done) {
+        // done이 true라면 완료 -> 미완료로 수정
+        titleEl.appendChild(titleEl.firstChild.firstChild);
+        titleEl.firstChild.remove();
+      } else {
+        // done이 false라면 미완료 -> 완료로 수정
+        const sElem = document.createElement("s"); // <s>
+        sElem.appendChild(titleEl.firstChild);
+        titleEl.appendChild(sElem);
+      }
+      targetLi.dataset.done = !done; // 완료 여부 토글
+    }
+
+    // 🚀 항목 삭제 함수
+    function deleteItem(no) {
+      const targetLi = document.querySelector(`.todoList >li[data-no="${no}"]`);
+      targetLi.remove(); // 해당 번호의 항목 삭제
+    }
+  </script>
+</body>
